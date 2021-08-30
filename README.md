@@ -1,3 +1,14 @@
 ### Fine-grained Event Classification
 
-Label text according to an event type taxonomy based.
+Label text according to a taxonomy of event types.
+
+
+### About the ACLED Event Database
+
+
+
+### Zero-shot Text Classification
+
+
+
+
