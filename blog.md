@@ -27,6 +27,10 @@ We submitted several systems to the CASE shared task to get an idea how our mode
 
 What the results were:
 
+**Code**
+
+Check out our implementation in [this notebook](notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it build a custom classifier.
+
 #### What you can do with our work:
 
 Start building a zero-shot classifier by writing down descriptions of events you’re interested in
