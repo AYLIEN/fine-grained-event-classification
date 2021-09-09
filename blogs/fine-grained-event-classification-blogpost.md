@@ -4,7 +4,7 @@
 
 We often think of news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
 
-<img src="diagrams/news-events.png" alt="drawing" width="275"/>
+<img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
 But often, we are really only interested in certain _kinds_ of events. In other words, in my feed, I only want to see events meeting certain criteria.
 
@@ -22,7 +22,7 @@ Luckily there’s a shared task for that, the CASE fine-grained event classifica
 
 We submitted several systems to the CASE shared task to get an idea how our models stack up in an unbiased evaluation setting. After that we did some more experiments to explore how to make our models even better, while still maintaining the efficient classification-via-similarity framework.
 
-<div style="text-align:center"><img src="diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
+<div style="text-align:center"><img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
 
 **What the results were**
 
@@ -38,7 +38,7 @@ Based on the weighted F1-Score, our system was the best among several zero-shot 
 
 **Our Code**
 
-Check out our implementation in [this notebook](notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
+Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
 
 #### What you can do with our work:
 
