@@ -1,8 +1,10 @@
 # Blog: Zero-Shot Event Classification in News
 
-In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. Given a new piece of news content, one of the first things we may ask is "does this contain a new event?", then, if it does, "what type of event is this?". Defining what an `Event` is/isn't is notoriously challenging, but in this work we will stick to discrete occurences over short timespans, following the ACLED taxonomies. Implicitly or explicitly, we have a taxonomy of event types, and we would like to put this piece of content in its place.
+In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. Given a new piece of news content, one of the first things we may ask is "does this contain a new event?", then, if it does, "what type of event is this?". Defining what an `Event` is/isn't is notoriously challenging, but in this work we will stick to discrete occurences over short timespans, following the ACLED taxonomies. Implicitly or explicitly, we have a taxonomy of event types, and we would like to put this piece of content in its place, or ignore it if it isn't one of the things we're looking for.
 
-In News Intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
+In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
+
+As we all know, that stream is noisy, and humans are very good at contextualizing information and understanding what is useful and novel, and what is distraction. 
 
 Visualize: tags vs event schemas
 Visualize: a timeline of terrorist attacks 
