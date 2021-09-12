@@ -18,9 +18,12 @@ We often think of news as a time-series of discrete events. For example, we migh
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
-But often, we are really only interested in certain _kinds_ of events. In other words, in my feed, I only want to see events meeting certain criteria. For example, I might only care about monitoring a conflict or geopolitical crisis in a certain region. I want to filter the news stream, removing everything that doesn't meet the criteria of an interesting event. There are many ways we might approach this, but one of the most straightforward is to label each piece of content with one or more labels indicting what type of event happened.
+But often, we are really only interested in certain _kinds_ of events. In other words, in my personal feed, I only want to see events meeting certain criteria. For example, I might only care about monitoring a conflict or geopolitical crisis in a certain region. I want to filter the news stream, removing everything that doesn't meet the criteria of an interesting event. There are many ways we might approach this, but one of the most straightforward is to label each piece of content with one or more labels indicting what type of event happened.
 
-Note the distinction between what happened (events) vs what the content is about (topics). This is important because I don't want to see content that is a general discussion of geopolitical conflict, I only want my stream to capture specific instances of conflict. 
+Note the distinction between what happened (events) vs what the content is about (topics). This is important because I don't want to see content that is a general discussion of geopolitical conflict, I only want my stream to capture specific instances of conflict. I want to get pinged when a new terrorist attack happens, but I don't want to get pinged about general discussions or opinion pieces related to terrorism. Let's try to make our mental model explicit -- I have an idea of what an event is/isn't. Different types of events have different properties in their schemas, and instantiations of the schema will be discrete events
+
+Connect to pattern matching in FP and OOP
+Frame Semantics and FP/OOP
 
 Note: the importance of zero-shot for this
 
