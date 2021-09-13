@@ -57,6 +57,11 @@ The CASE shared task organizers picked 5 event types for zero-shot experiments. 
 
 Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
 
+### Transformers vs. Word2Vec
+
+One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. However, we are embedding short snippets of text in this task, so these results might not hold if we were processing whole documents. Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model performance and throughput in production settings. 
+
+
 **Our Code**
 
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
