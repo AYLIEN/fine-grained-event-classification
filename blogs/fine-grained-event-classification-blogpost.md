@@ -4,12 +4,13 @@ We often think of news as a time-series of discrete events. For example, we migh
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
-However, the raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. 
 
-Humans: powerful model, low throughput
+Visualize Humans: powerful model, low throughput
+
+However, a raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us. One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
 
 
-
+Thus
 
 In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
 
