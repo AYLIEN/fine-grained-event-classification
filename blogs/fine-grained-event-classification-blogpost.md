@@ -9,16 +9,20 @@ Visualize Humans: powerful model, low throughput
 
 However, a raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us. One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
 
+In this post, we're focusing on a specific text-classification task: zero-shot fine-grained event classification.
 
-Thus
-
-In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
+### The Zero-shot Event Classification Task
 
 
-Visualize: tags vs event schemas
-Visualize: a timeline of terrorist attacks 
+##### The Setting
 
-Note: event duration, etc are out-of-scope
+```
+Input: snippets of text
+Output: snippets labeled according to a taxonomy of event types
+No training data
+```
+
+The zero-shot component of this task is important, because we assume that our set of possible event labels will always be evolving. If a user come to us with a new event type, we want to be able to immediately start labeling events without needing to collect a new labeled dataset or go through a complicated re-training/tuning flow.   
 
 In this post, we'll go over an approach to zero-shot event classification that worked well at the CASE 2021 fine grained event detection shared task. 
 
@@ -86,3 +90,10 @@ Check out our implementation in [this notebook](../notebooks/SentenceTransformer
 Buffer
 In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. 
 
+In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
+
+
+Visualize: tags vs event schemas
+Visualize: a timeline of terrorist attacks 
+
+Note: event duration, etc are out-of-scope
