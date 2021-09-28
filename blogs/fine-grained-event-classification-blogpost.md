@@ -1,5 +1,13 @@
 # Blog: Zero-Shot Event Classification in News
 
+
+#### TLDR -- What is this post about?
+* Zero-shot learning, fine-grained event classification and the CASE 2021 shared task
+* A simple, effective and scalable approach for zero-shot event classification
+* Notebook with code and examples
+
+--- 
+
 We often think of news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
@@ -13,16 +21,14 @@ In this post, we're focusing on a specific text-classification task: zero-shot f
 
 ### The Zero-shot Event Classification Task
 
-
-##### The Setting
+#### The Setting
+Zero-shot classification setups are usually defined by the lack of examples labelled with classes of interest. Instead, they usually represent each class through meta information, e.g. a short textual class description in the case of text classification. We are interested in this setup because it simplifies the event classification workflow a lot: if a user comes to us with a new event type, we want to be able to immediately start serving them news events of that class without needing to collect a new labelled dataset or go through a complicated re-training/tuning stage. We wish to have a classifier that can solve this problem:
 
 ```
 Input: snippets of text
 Output: snippets labeled according to a taxonomy of event types
 No training data
 ```
-
-The zero-shot component of this task is important, because we assume that our set of possible event labels will always be evolving. If a user come to us with a new event type, we want to be able to immediately start labeling events without needing to collect a new labeled dataset or go through a complicated re-training/tuning flow.   
 
 In this post, we'll go over an approach to zero-shot event classification that worked well at the CASE 2021 fine grained event detection shared task. 
 
@@ -31,9 +37,7 @@ In this post, we'll go over an approach to zero-shot event classification that w
 
 There are many reasons I might be monitoring the news for a certain type of event -- I might be looking for events that would impact the supply chain of a particular business, or for events that are likely to impact political decisions in a certain region. One of the most common reasons to monitor the news at scale is to filter for new risks related to a particular business vertical. In each of these examples, I am looking for news events that meet a certain criteria. One way to specify the type of event I'm looking for is to use a taxonomy of event types such as the one used by ACLED. 
 
-Given a new piece of news content, one of the first things we may ask is "does this contain a new event?", then, if it does, "what type of event is this?". Defining what an `Event` is/isn't is notoriously challenging, but in this work we will stick to discrete occurences over short timespans, following the ACLED taxonomies. Implicitly or explicitly, we have a taxonomy of event types, and we would like to put this piece of content in its place, or ignore it if it isn't one of the things we're looking for.
-
-
+Given a new piece of news content, one of the first things we may ask is "does this contain a new event?", then, if it does, "what type of event is this?". Defining what an `Event` is is notoriously challenging, but in this work we will stick to discrete occurences over short timespans, following the ACLED taxonomies. Implicitly or explicitly, we have a taxonomy of event types, and we would like to put this piece of content in its place, or ignore it if it isn't one of the things we're looking for.
 
 But often, we are really only interested in certain _kinds_ of events. In other words, in my personal feed, I only want to see events meeting certain criteria. For example, I might only care about monitoring a conflict or geopolitical crisis in a certain region. I want to filter the news stream, removing everything that doesn't meet the criteria of an interesting event. There are many ways we might approach this, but one of the most straightforward is to label each piece of content with one or more labels indicting what type of event happened.
 
@@ -50,7 +54,7 @@ We call the task of labeling each event in a stream with its type **event classi
 
 Since we’re sciency types, of course we want to use a machine learning model to do this. And since we’re engineers we want the model we use to be fast, cheap, and scalable. So we’re going to constrain ourselves to the simplest type of model, but we’re going to be clever about how we set things up.
 
-**The task**
+**The shared task**
 
 Luckily there’s a shared task for that, the CASE fine-grained event classification shared task. The task is to classify short text snippets that report socio-political events into fine-grained event types. These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
 
