@@ -16,12 +16,13 @@ We often think of the news as a time-series of discrete events. For example, we 
 
 <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="275"/>
 
-However, a raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us, especially when we want to monitor world news for certain types of events. One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
+However, the raw stream of news events is very noisy. Humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us.  One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
 
-To build such a monitoring system, we will need a way of classifying news events according to their type. This is a text-classification task, with an interesting twist: we may not know the types of events upfront. In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
+To build our news event monitoring system, we will need a way of classifying events according to their type. We can approach it as a text-classification task, with an interesting twist: we may not know the types of events upfront. In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
-Luckily, there's a shared task for that. 
-In this post, we're focusing on a specific text-classification task: zero-shot fine-grained event classification.
+In addition, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, while considering hundreds or thousands of labels. 
+
+In this post, we're focusing on a specific text-classification task: zero-shot fine-grained event classification. We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task. Shared tasks are a great way to test ideas in a fair and open setting, and to get fast feedback about how different approaches stack up. 
 
 ### The Zero-shot Event Classification Task
 
