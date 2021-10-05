@@ -4,19 +4,23 @@
 #### TLDR -- What is this post about?
 * Zero-shot learning, fine-grained event classification and the CASE 2021 shared task
 * A simple, effective and scalable approach for zero-shot event classification
-* Notebook with code and examples
+* Notebooks with code and examples
 
 --- 
 
-We often think of news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
+### A Stream of Events
+
+We often think of the news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
+<img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="275"/>
 
-Visualize Humans: powerful model, low throughput
+However, a raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us, especially when we want to monitor world news for certain types of events. One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
 
-However, a raw stream of news events is very noisy -- humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us. One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
+To build such a monitoring system, we will need a way of classifying news events according to their type. This is a text-classification task, with an interesting twist: we may not know the types of events upfront. In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
+Luckily, there's a shared task for that. 
 In this post, we're focusing on a specific text-classification task: zero-shot fine-grained event classification.
 
 ### The Zero-shot Event Classification Task
