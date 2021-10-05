@@ -2,6 +2,8 @@
 
 Label text according to a taxonomy of event types.
 
+### Blog Post
+
 [Blog Post](blogs/fine-grained-event-classification-blogpost.md)
 
 
