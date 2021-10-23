@@ -1,17 +1,35 @@
-### Fine-grained Event Classification
+### Zero Shot Fine-grained Event Classification
 
-Label text according to a taxonomy of event types.
+Label a stream of texts according to a taxonomy of event types.
+For each label, we only require an English description.
 
 ### Blog Post
 
 [Blog Post](blogs/fine-grained-event-classification-blogpost.md)
 
+### Notebooks
 
-### About the ACLED Event Database
+(1) clone repo
+```
+git clone https://github.com/AYLIEN/fine-grained-event-classification
+```
+(2) create an activate a new environment (we like miniconda)
+```
+conda create -n event-classification python=3.7`
+conda activate event-classification
+```
+(3) install dependencies
+```
+pip install -r requirements.txt
+```
+(4) install jupyter notebook
+```
+pip install jupyter notebook
+```
+(5) run `jupyter notebook` from the `notebooks/` directory 
 
 
 
-### Zero-shot Text Classification
 
 
 

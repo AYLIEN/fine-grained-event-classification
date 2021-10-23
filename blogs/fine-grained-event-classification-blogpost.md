@@ -88,14 +88,18 @@ One of our important takeaways from this work was that transformer-based embeddi
 
 **Our Code**
 
+#### Notebooks 
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
+
+
+There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
 
 #### What you can do with our work:
 
 * Start building a zero-shot classifier by writing down descriptions of events you’re interested in
 * Apply our system to classify news with your custom labels
 
-
+-----------
 Buffer
 In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. 
 
