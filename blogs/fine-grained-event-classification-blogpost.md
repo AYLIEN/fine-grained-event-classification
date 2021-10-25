@@ -7,33 +7,53 @@
 * Notebooks with code and examples
 
 We hope readers of this post come away with a clear understanding of how easy it is to create a 
-reasonably efficient zero-shot text-classification model that is a good baseline for many tasks.
+reasonably efficient zero-shot text-classification model that is a good baseline for many real world tasks.
+
+In practice, creating performant and scalable NLP models for real products usually requires iteration 
+on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
+data annotation, and real-world ML experience. 
 
 --- 
 
-### A Stream of Events
+### The News is a Stream of Events
 
-We often think of the news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
+We intuitively think of the news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
 <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="275"/>
 
-However, the raw stream of news events is very noisy. Humans are good at contextualizing information and understanding what is useful, but we aren't good at processing lots of content, and we don't scale well. So we need automatic ways to filter the raw stream of events to only contain news that is relevant to us.  One way of filtering is to use machine learning models for text classification, and to only subscribe to certain labels that are assigned by our models.
+However, a raw stream of news events, such as the RSS feed of a major news publisher, is very noisy. 
+Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
+processing high volumes of content, and we don't scale well. 
 
-To build our news event monitoring system, we will need a way of classifying events according to their type. We can approach it as a text-classification task, with an interesting twist: we may not know the types of events upfront. In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
+We would like to build automatic ways to filter the raw stream of events to only contain news that is relevant to us. 
+One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
+that are assigned by our models. Note that this is related to following particular topics on sites such as Google News, with the important
+distinction that we do not want to miss any events of a certain type. In other words, we are not building a recommender system, 
+we are building a ML-driven event monitoring system for _**filtering**_ news content.
 
-In addition, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, while considering hundreds or thousands of labels. 
+To build our news event monitoring system, we will need a way of classifying events according to their type. 
+We can approach it as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
+In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
-In this post, we're focusing on a specific text-classification task: zero-shot fine-grained event classification. We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task. Shared tasks are a great way to test ideas in a fair and open setting, and to get fast feedback about how different approaches stack up. 
+In addition, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, 
+while easily handling hundreds or thousands of distinct labels, each of which may have a very different expected volume 
+per day. 
+
+With these requirements in mind, we would like to explore good baselines for such a system.
+In this post, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
+We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task.
+Shared tasks are a great way to test and share ideas in a fair and open setting, 
+and to get fast feedback about how different approaches stack up. 
 
 ### The Zero-shot Event Classification Task
 
 #### The Setting
-Zero-shot classification setups are usually defined by the lack of examples labelled with classes of interest. 
-Instead, they usually represent each class through meta information, e.g. a short textual class description in 
-the case of text classification. 
-We are interested in this setup because it simplifies the event classification workflow a lot: 
+Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
+Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
+description in the case of text classification. 
+We are interested in this setup because it simplifies the baseline event classification workflow a lot: 
 if a user comes to us with a new event type, we want to be able to immediately start serving them news events of 
 that class without needing to collect a new labelled dataset or go through a complicated re-training/tuning stage. 
 
@@ -74,12 +94,6 @@ labels indicting what type of event happened.
 
 We call the task of labeling each event in a stream with its type **event classification**.
 
-#### What we did about it
-
-Since we’re sciency types, of course we want to use a machine learning model to do this. 
-And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
-So we’re going to constrain ourselves to the simplest type of model, but we’re going to be clever about how we set things up.
-
 **The shared task**
 
 The CASE fine-grained event classification shared task is an ideal challenge for testing zero-shot text classification models. 
@@ -89,9 +103,17 @@ which contains 25 detailed event types, such as “Peaceful protest”, “Prote
 
 **Zero-shot classification**
 
-We submitted several systems to the CASE shared task to get an idea how our models stack up in an unbiased evaluation setting. After that we did some more experiments to explore how to make our models even better, while still maintaining the efficient classification-via-similarity framework.
+We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an 
+unbiased evaluation setting. After that we did some more experiments to explore how to make our models even better, while still maintaining the efficient classification-via-similarity framework.
 
 <div style="text-align:center"><img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
+
+#### Nearest-Neighbors Based Zero-Shot Classification
+
+Since we’re sciency types, obviously we want to use cool machine learning models.
+And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
+So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
+but we’re going to be clever about how we set things up.
 
 **What the results were**
 
