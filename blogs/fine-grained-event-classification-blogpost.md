@@ -15,9 +15,8 @@ data annotation, and real-world ML experience.
 
 --- 
 
-### The News is a Stream of Events
-
-We intuitively think of the news as a time-series of discrete events. For example, we might visualize yesterday’s top news events like this:
+We intuitively think of the news as a time-series of discrete events. 
+For example, we might visualize yesterday’s top news events like this:
 
 <img src="../diagrams/news-events.png" alt="drawing" width="275"/>
 
