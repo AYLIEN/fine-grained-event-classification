@@ -118,7 +118,7 @@ Instead, we will encode text snippets and label descriptions separately into emb
 2) Classify a new text snippet:
   - encode snippet
   - measure cosine between snippet embbedding and label embeddings
-  - pick label closest embedding
+  - pick label with closest embedding
 
 If we had hundreds or thousands of labels, measuring the cosine to every single label can also be become expensive - however there is a simple fix: we can use *approximate nearest-neighbor search* to find the closest label(s). The approach naturally supports dynamic labels: we simply add or remove labels and their embeddings from our storage.
 
