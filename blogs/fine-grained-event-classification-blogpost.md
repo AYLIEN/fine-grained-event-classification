@@ -18,13 +18,17 @@ data annotation, and real-world ML experience.
 We intuitively think of the news as a time-series of discrete events. 
 For example, we might visualize yesterday’s top news events like this:
 
-<img src="../diagrams/news-events.png" alt="drawing" width="275"/>
-
-<img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="275"/>
+<p align="center">
+  <img src="../diagrams/news-events.png" alt="drawing" width="300"/>
+</p>
 
 However, a raw stream of news events, such as the RSS feed of a major news publisher, is very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
 processing high volumes of content, and we don't scale well. 
+
+<p align="center">
+  <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
+</p>
 
 We would like to build automatic ways to filter the raw stream of events to only contain news that is relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
@@ -100,13 +104,6 @@ The task is to classify short text snippets that report socio-political events i
 These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, 
 which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
 
-**Zero-shot classification**
-
-We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an 
-unbiased evaluation setting. After that we did some more experiments to explore how to make our models even better, while still maintaining the efficient classification-via-similarity framework.
-
-<div style="text-align:center"><img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
-
 #### Nearest-Neighbors Based Zero-Shot Classification
 
 Since we’re sciency types, obviously we want to use cool machine learning models.
@@ -114,8 +111,27 @@ And since we’re engineers we want the model we use to be fast, cheap, and scal
 So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
 but we’re going to be clever about how we set things up.
 
-**What the results were**
+The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. In this shared task, label descriptions are for example "Man-made disaster" or "Peaceful protest". A powerful zero-shot model could be trained to jointly "read" both the text snippet and a label description to output a score indicating how closely related they are. However, doing this for thousands or millions of text snippets and tens or hundreds of labels is computationally expensive.
 
+Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space. Using these embeddings, we measure the cosine similarity between a snippet and each label. We classify a snippet by simply picking the label with the closest embedding. A crucial requirement is to have a powerful vector representation. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels. We summarize our approach as follows:
+1) Encode label descriptions, store label embeddings
+2) Classify a new text snippet:
+  - encode snippet
+  - measure cosine between snippet embbedding and label embeddings
+  - pick label closest embedding
+
+If we had hundreds or thousands of labels, measuring the cosine to every single label can also be become expensive - however there is a simple fix: we can use *approximate nearest-neighbor search* to find the closest label(s). The approach naturally supports dynamic labels: we simply add or remove labels and their embeddings from our storage.
+
+Here is a diagram of this framework:
+
+<p align="center">
+  <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
+<p>
+  
+We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. The model described above worked best.
+
+**What the results were**
+  
 The CASE shared task organizers picked 5 event types for zero-shot experiments. All submitted systems had to classify examples of these types without having seen training examples of these. Our best system produced the following average evaluation scores over these labels:
 
 |          | Precision | Recall | F1-Score |
@@ -130,10 +146,7 @@ Based on the weighted F1-Score, our system was the best among several zero-shot 
 
 One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. However, we are embedding short snippets of text in this task, so these results might not hold if we were processing whole documents. Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model performance and throughput in production settings. 
 
-
-**Our Code**
-
-#### Notebooks 
+### Notebooks 
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
 
 This notebook works through setup and
