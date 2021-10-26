@@ -1,17 +1,13 @@
 # Blog: Zero-Shot Event Classification in News
 
 
-#### TLDR -- What is this post about?
-* Zero-shot learning, fine-grained event classification and the CASE 2021 shared task
-* A simple, effective and scalable approach for zero-shot event classification
+#### TLDR -- What's in this post?
+* an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
+* An overview of a simple, effective and scalable approach for zero-shot event classification
 * Notebooks with code and examples
 
 We hope readers of this post come away with a clear understanding of how easy it is to create a 
 reasonably efficient zero-shot text-classification model that is a good baseline for many real world tasks.
-
-In practice, creating performant and scalable NLP models for real products usually requires iteration 
-on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
-data annotation, and real-world ML experience. 
 
 --- 
 
@@ -134,17 +130,35 @@ One of our important takeaways from this work was that transformer-based embeddi
 **Our Code**
 
 #### Notebooks 
-Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) and use it to build a custom classifier.
+Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
+and use it to build a custom classifier.
 
-This notebook works through setup and
+This notebook sets up the dataset for the fine grained shared task, and implements a zero-shot prediction model, 
+which uses the [paraphrase-multilingual-mpnet-base-v2](https://www.sbert.net/docs/pretrained_models.html) 
+from the [sentence transformers library](https://www.sbert.net/index.html). This excellent library and repository of pre-trained models 
+provides a great starting point for prototyping zero-shot text classification systems. 
 
+We simply embed each of the labels using its meta-data and we are immediately ready to classify. 
 
 There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
+
+From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
+document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is taught in applied ML courses. 
+In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
+and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
+
 
 #### What you can do with our work:
 
 * Start building a zero-shot classifier by writing down descriptions of events you’re interested in
 * Apply our system to classify news with your custom labels
+
+### Conclusion
+
+In practice, creating performant and scalable NLP models for real products usually requires iteration 
+on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
+data annotation, and real-world ML experience. 
+
 
 -----------
 Buffer
