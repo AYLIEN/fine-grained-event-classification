@@ -6,12 +6,13 @@
 * An overview of a simple, effective and scalable approach for zero-shot event classification
 * Notebooks with code and examples
 
-We hope readers of this post come away with a clear understanding of how easy it is to create a 
-reasonably efficient zero-shot text-classification model that is a good baseline for many real world tasks.
+We hope readers come away with a clear understanding of how easy it is to create  
+reasonably efficient zero-shot text-classification models that are good baselines for many real world tasks.
 
---- 
+----------------- 
+### The News as a Stream of Events
 
-We intuitively think of the news as a time-series of discrete events. 
+We intuitively think of news as a time-series of discrete events. 
 For example, we might visualize yesterday’s top news events like this:
 
 <p align="center">
@@ -26,7 +27,7 @@ processing high volumes of content, and we don't scale well.
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
 </p>
 
-We would like to build automatic ways to filter the raw stream of events to only contain news that is relevant to us. 
+Therefore, we would like to build automatic ways to filter the raw stream of events to only contain news that is relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
 that are assigned by our models. Note that this is related to following particular topics on sites such as Google News, with the important
 distinction that we do not want to miss any events of a certain type. In other words, we are not building a recommender system, 
@@ -36,11 +37,21 @@ To build our news event monitoring system, we will need a way of classifying eve
 We can approach it as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
 In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
-In addition, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, 
+In another twist: we may not have _any_ training data at all for the classes we want to detect. We might just have 
+a class label, and possibly a short snippet of text describing the label. 
+
+And finally, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, 
 while easily handling hundreds or thousands of distinct labels, each of which may have a very different expected volume 
 per day. 
 
-With these requirements in mind, we would like to explore good baselines for such a system.
+Amazingly, it is actually possible to build systems that can satisfy these requirements. They're not as 
+good as systems that use powerful models with substantial training data, but they do work, and can serve as good baselines 
+for any explorations in text classification. 
+
+#### Key Ingredients
+
+With these requirements set out in the previous section in mind, let's now find a real world dataset to use.
+
 In this post, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
 We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task.
 Shared tasks are a great way to test and share ideas in a fair and open setting, 
@@ -61,12 +72,115 @@ In a nutshell, we wish to have a classifier that can solve this problem:
 Input: snippets of text
 Output: snippets labeled according to a taxonomy of event types
 No training data
+High Throughput
 ```
 
 In this post, we'll go over an approach to zero-shot event classification that worked well at 
-the CASE 2021 fine grained event detection shared task. 
+the CASE 2021 fine grained event detection shared task. Code and examples are available
+in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
 
-#### Why we care about event classification
+**The shared task**
+
+The CASE fine-grained event classification shared task is an ideal challenge for testing zero-shot text classification models. 
+The task is to classify short text snippets that report socio-political events into fine-grained event types. 
+These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, 
+which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
+
+#### Nearest-Neighbors Based Zero-Shot Classification
+
+Since we’re sciency types, obviously we want to use cool machine learning models.
+And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
+So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
+but we’re going to be clever about how we set things up.
+
+The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. 
+
+In this particular task, label descriptions are for example "Man-made disaster" or "Peaceful protest". 
+A powerful zero-shot model could be trained to jointly "read" both the text snippet and a 
+label description to output a score indicating how closely related they are. 
+
+[//]: # (TODO: cite NLI-based models)
+
+However, doing pairwise comparisons between thousands or millions of text snippets and tens or 
+hundreds of labels is computationally expensive.
+
+Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space. Using these embeddings, we measure the cosine similarity between a snippet and each label. We classify a snippet by simply picking the label with the closest embedding. A crucial requirement is to have a powerful vector representation. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels. We summarize our approach as follows:
+1) Encode label descriptions, store label embeddings
+2) Classify a new text snippet:
+  - encode snippet
+  - measure cosine between snippet embbedding and label embeddings
+  - pick label with closest embedding
+
+If we have hundreds or thousands of labels, measuring the cosine to every single label can also be become expensive - however, 
+there is a simple fix: we can use *approximate nearest-neighbor search* to find the closest label(s). 
+
+The approach naturally supports dynamic labels: we simply add or remove labels and their embeddings from our storage.
+
+Here is a diagram of this framework:
+
+<p align="center">
+  <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
+<p>
+  
+We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. 
+The model described above worked best.
+
+**Results**
+  
+The CASE shared task organizers picked 5 event types for zero-shot experiments. All submitted systems had to classify examples of these types without having seen training examples of these. Our best system produced the following average evaluation scores over these labels:
+
+|          | Precision | Recall | F1-Score |
+|----------|-----------|--------|-----------|
+| **micro**    | 0.840     | 0.358  | 0.502     |
+| **macro**    | 0.914     | 0.383  | 0.477     |
+| **weighted** | 0.920     | 0.358  | 0.443     |
+
+Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
+
+### Transformers vs. Word2Vec
+
+One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. 
+However, we are embedding short snippets of text in this task, so these results might not hold if we were processing whole documents. 
+Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model 
+performance and throughput in production settings. 
+
+**Our Code**
+
+#### Notebooks 
+Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
+and use it to build a custom classifier.
+
+This notebook sets up the dataset for the fine grained shared task, and implements a zero-shot prediction model, 
+which uses the [paraphrase-multilingual-mpnet-base-v2](https://www.sbert.net/docs/pretrained_models.html) 
+from the [sentence transformers library](https://www.sbert.net/index.html). This excellent library and repository of pre-trained models 
+provides a great starting point for prototyping zero-shot text classification systems. 
+
+We simply embed each of the labels using its meta-data and we are immediately ready to classify. 
+
+There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
+
+From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
+document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is taught in applied ML courses. 
+In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
+and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
+
+
+#### What you can do with this work:
+
+* Start building a zero-shot classifier by writing down descriptions of events you’re interested in
+* Apply our system to classify news with your custom labels
+
+### Conclusion
+
+In practice, creating performant and scalable NLP models for real products usually requires iteration 
+on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
+data annotation, and real-world ML experience. 
+
+
+-----------
+## Buffer
+
+#### Why we care about event classification at Aylien
 
 There are many reasons I might be monitoring a stream of news for a certain type of event -- 
 I might be looking for events that would impact the supply chain of a particular business, or for events 
@@ -93,90 +207,6 @@ labels indicting what type of event happened.
 
 We call the task of labeling each event in a stream with its type **event classification**.
 
-**The shared task**
-
-The CASE fine-grained event classification shared task is an ideal challenge for testing zero-shot text classification models. 
-The task is to classify short text snippets that report socio-political events into fine-grained event types. 
-These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, 
-which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
-
-#### Nearest-Neighbors Based Zero-Shot Classification
-
-Since we’re sciency types, obviously we want to use cool machine learning models.
-And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
-So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
-but we’re going to be clever about how we set things up.
-
-The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. In this shared task, label descriptions are for example "Man-made disaster" or "Peaceful protest". A powerful zero-shot model could be trained to jointly "read" both the text snippet and a label description to output a score indicating how closely related they are. However, doing this for thousands or millions of text snippets and tens or hundreds of labels is computationally expensive.
-
-Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space. Using these embeddings, we measure the cosine similarity between a snippet and each label. We classify a snippet by simply picking the label with the closest embedding. A crucial requirement is to have a powerful vector representation. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels. We summarize our approach as follows:
-1) Encode label descriptions, store label embeddings
-2) Classify a new text snippet:
-  - encode snippet
-  - measure cosine between snippet embbedding and label embeddings
-  - pick label with closest embedding
-
-If we had hundreds or thousands of labels, measuring the cosine to every single label can also be become expensive - however there is a simple fix: we can use *approximate nearest-neighbor search* to find the closest label(s). The approach naturally supports dynamic labels: we simply add or remove labels and their embeddings from our storage.
-
-Here is a diagram of this framework:
-
-<p align="center">
-  <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
-<p>
-  
-We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. The model described above worked best.
-
-**What the results were**
-  
-The CASE shared task organizers picked 5 event types for zero-shot experiments. All submitted systems had to classify examples of these types without having seen training examples of these. Our best system produced the following average evaluation scores over these labels:
-
-|          | Precision | Recall | F1-Score |
-|----------|-----------|--------|-----------|
-| **micro**    | 0.840     | 0.358  | 0.502     |
-| **macro**    | 0.914     | 0.383  | 0.477     |
-| **weighted** | 0.920     | 0.358  | 0.443     |
-
-Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
-
-### Transformers vs. Word2Vec
-
-One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. However, we are embedding short snippets of text in this task, so these results might not hold if we were processing whole documents. Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model performance and throughput in production settings. 
-
-**Our Code**
-
-#### Notebooks 
-Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
-and use it to build a custom classifier.
-
-This notebook sets up the dataset for the fine grained shared task, and implements a zero-shot prediction model, 
-which uses the [paraphrase-multilingual-mpnet-base-v2](https://www.sbert.net/docs/pretrained_models.html) 
-from the [sentence transformers library](https://www.sbert.net/index.html). This excellent library and repository of pre-trained models 
-provides a great starting point for prototyping zero-shot text classification systems. 
-
-We simply embed each of the labels using its meta-data and we are immediately ready to classify. 
-
-There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
-
-From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
-document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is taught in applied ML courses. 
-In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
-and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
-
-
-#### What you can do with our work:
-
-* Start building a zero-shot classifier by writing down descriptions of events you’re interested in
-* Apply our system to classify news with your custom labels
-
-### Conclusion
-
-In practice, creating performant and scalable NLP models for real products usually requires iteration 
-on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
-data annotation, and real-world ML experience. 
-
-
------------
-Buffer
 In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. 
 
 In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
