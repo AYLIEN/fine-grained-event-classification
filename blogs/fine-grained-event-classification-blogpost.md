@@ -1,10 +1,15 @@
 # Blog: Zero-Shot Event Classification in News
 
 
-#### TLDR -- What's in this post?
-* an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
-* An overview of a simple, effective and scalable approach for zero-shot event classification
-* Notebooks with code and examples
+#### TLDR
+* we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
+* we share a simple, effective and scalable approach for zero-shot event classification
+* we provide jupyter notebooks with code and examples
+
+#### What you can do with this work
+
+* Start building a zero-shot classifier by writing down descriptions of events you’re interested in
+* Apply our system to classify news with your custom labels
 
 We hope readers come away with a clear understanding of how easy it is to create  
 reasonably efficient zero-shot text-classification models that are good baselines for many real world tasks.
@@ -21,41 +26,45 @@ For example, we might visualize yesterday’s top news events like this:
 
 However, a raw stream of news events, such as the RSS feed of a major news publisher, is very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
-processing high volumes of content, and we don't scale well. 
+processing high volumes of content, and we don't scale well, thus the desire to automate some of the news 
+filtering process. 
 
 <p align="center">
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
 </p>
 
-Therefore, we would like to build automatic ways to filter the raw stream of events to only contain news that is relevant to us. 
+We would like to build automatic ways to filter the raw stream of news to only contain events that are relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
 that are assigned by our models. Note that this is related to following particular topics on sites such as Google News, with the important
-distinction that we do not want to miss any events of a certain type. In other words, we are not building a recommender system, 
-we are building a ML-driven event monitoring system for _**filtering**_ news content.
+distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
+we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
+[//]: # (TODO: note that recommender systems intuitively go for precision and don't worry about recall)
 
 To build our news event monitoring system, we will need a way of classifying events according to their type. 
-We can approach it as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
+We can approach this as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
 In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
-In another twist: we may not have _any_ training data at all for the classes we want to detect. We might just have 
+In another twist: we may not have _**any**_ training data at all for the classes we want to detect. We might just have 
 a class label, and possibly a short snippet of text describing the label. 
 
-And finally, our news stream is _really_ big: we're looking for solutions that scale to millions of articles per day, 
+And finally, our news stream is _**really**_ big: we're looking for solutions that scale to millions of articles per day, 
 while easily handling hundreds or thousands of distinct labels, each of which may have a very different expected volume 
 per day. 
 
-Amazingly, it is actually possible to build systems that can satisfy these requirements. They're not as 
-good as systems that use powerful models with substantial training data, but they do work, and can serve as good baselines 
-for any explorations in text classification. 
+Amazingly, it is actually possible to build systems that can satisfy these requirements. They don't outperform usecase-specific 
+systems that use expensive models with substantial in-domain training data, but they do work, and can serve as good baselines 
+for any explorations in text classification, especially when support for zero-shot classification is a requirement. 
 
 #### Key Ingredients
 
-With these requirements set out in the previous section in mind, let's now find a real world dataset to use.
+With these requirements set out in the previous section in mind, let's now find a real world dataset 
+to use for development.
 
-In this post, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
+We'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
 We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task.
 Shared tasks are a great way to test and share ideas in a fair and open setting, 
-and to get fast feedback about how different approaches stack up. 
+and to get fast feedback about how different approaches stack up. Many thanks to the organizers of the CASE 2021 
+shared task for all of the hard work they did.  
 
 ### The Zero-shot Event Classification Task
 
@@ -164,11 +173,6 @@ document embedding than the supervised view of K-nearest-neighbors models that i
 In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
 and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
 
-
-#### What you can do with this work:
-
-* Start building a zero-shot classifier by writing down descriptions of events you’re interested in
-* Apply our system to classify news with your custom labels
 
 ### Conclusion
 
