@@ -11,8 +11,7 @@
 * Start building a zero-shot classifier by writing down descriptions of events you’re interested in
 * Apply our system to classify news with your custom labels
 
-We hope readers come away with a clear understanding of how easy it is to create  
-reasonably efficient zero-shot text-classification models that are good baselines for many real world tasks.
+We hope readers come away with a clear understanding of how easy it is to create reasonably efficient zero-shot text-classification models that are good baselines for many real world tasks.
 
 ----------------- 
 ### The News as a Stream of Events
@@ -26,12 +25,12 @@ For example, we might visualize yesterday’s top news events like this:
 
 However, a raw stream of news events, such as the RSS feed of a major news publisher, is very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
-processing high volumes of content, and we don't scale well, thus the desire to automate some of the news 
-filtering process. 
+processing high volumes of content, and we don't scale well. 
 
-<p align="center">
+<figure align="center">
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
-</p>
+  <figcaption>Manual News Event Extraction</figcaption>
+</figure>
 
 We would like to build automatic ways to filter the raw stream of news to only contain events that are relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
@@ -179,6 +178,35 @@ and creating a KNN classifier with `K = 1` and exactly one candidate for each la
 In practice, creating performant and scalable NLP models for real products usually requires iteration 
 on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
 data annotation, and real-world ML experience. 
+
+
+## References
+
+Case 2021 Task 2: Fine-grained Event Classification Github repo 
+https://github.com/emerging-welfare/case-2021-shared-task/tree/main/task2
+
+Jakub Piskorski, Jacek Haneczok, Guillaume Jacquet
+New Benchmark Corpus and Models for Fine-grained Event Classification: To BERT or not to BERT?
+https://aclanthology.org/2020.coling-main.584/
+
+Yu Meng, Yunyi Zhang, Jiaxin Huang, Chenyan Xiong, Heng Ji, Chao Zhang, Jiawei Han
+Text Classification Using Label Names Only: A Language Model Self-Training Approach.
+https://aclanthology.org/2020.emnlp-main.724/
+
+Fine-grained Event Classification in News-like Text Snippets-Shared Task 2, CASE 2021
+J Haneczok, G Jacquet, J Piskorski… - Proceedings of the 4th …, 2021 - aclanthology.org
+This paper describes the Shared Task on Fine-grained Event Classification in News-like
+Text Snippets. The Shared Task is divided into three sub-tasks:(a) classification of text
+snippets reporting socio-political events (25 classes) for which vast amount of training data …
+https://aclanthology.org/2021.case-1.23/
+
+CASE 2021 Task 2 Socio-political Fine-grained Event Classification using Fine-tuned RoBERTa Document Embeddings
+S Kent, T Krumbiegel - Proceedings of the 4th Workshop on …, 2021 - aclanthology.org
+We present our submission to Task 2 of the Socio-political and Crisis Events Detection
+Shared Task at the CASE@ ACL-IJCNLP 2021 workshop. The task at hand aims at the fine-
+grained classification of socio-political events. Our best model was a fine-tuned RoBERTa …
+https://aclanthology.org/2021.case-1.26/
+
 
 
 -----------
