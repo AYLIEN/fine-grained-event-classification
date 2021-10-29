@@ -27,10 +27,9 @@ However, a raw stream of news events, such as the RSS feed of a major news publi
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
 processing high volumes of content, and we don't scale well. 
 
-<figure align="center">
+<p align="center">
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
-  <figcaption>Manual News Event Extraction</figcaption>
-</figure>
+</p>
 
 We would like to build automatic ways to filter the raw stream of news to only contain events that are relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
