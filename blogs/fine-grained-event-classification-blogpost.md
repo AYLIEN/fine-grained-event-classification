@@ -23,7 +23,7 @@ For example, we might visualize yesterday’s top news events like this:
   <img src="../diagrams/news-events.png" alt="drawing" width="300"/>
 </p>
 
-However, a raw stream of news events, such as the RSS feed of a major news publisher, is very noisy. 
+However, raw streams of news events, such as the RSS feeds of major news publishers, are very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
 processing high volumes of content, and we don't scale well. 
 
@@ -31,12 +31,17 @@ processing high volumes of content, and we don't scale well.
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
 </p>
 
-We would like to build automatic ways to filter the raw stream of news to only contain events that are relevant to us. 
+### Event Classification
+
+We would like to build automatic ways to filter a raw stream of news to only contain events that are relevant to us. 
 One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
-that are assigned by our models. Note that this is related to following particular topics on sites such as Google News, with the important
+that are assigned by our models. This is similiar to following particular topics on sites such as Google News, with the important
 distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
 we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
+
 [//]: # (TODO: note that recommender systems intuitively go for precision and don't worry about recall)
+
+#### Detecting Event Types
 
 To build our news event monitoring system, we will need a way of classifying events according to their type. 
 We can approach this as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
@@ -49,22 +54,28 @@ And finally, our news stream is _**really**_ big: we're looking for solutions th
 while easily handling hundreds or thousands of distinct labels, each of which may have a very different expected volume 
 per day. 
 
-Amazingly, it is actually possible to build systems that can satisfy these requirements. They don't outperform usecase-specific 
-systems that use expensive models with substantial in-domain training data, but they do work, and can serve as good baselines 
-for any explorations in text classification, especially when support for zero-shot classification is a requirement. 
+Amazingly, it is actually possible to build a simple baseline system that satisfies these requirements.
+It won't outperform usecase-specific systems that use expensive models with substantial in-domain training data, 
+but it will serve as a good baselines for any explorations in text classification, 
+especially for usecases where scalable support for zero-shot classification is an essential requirement.
 
 #### Key Ingredients
 
-With these requirements set out in the previous section in mind, let's now find a real world dataset 
-to use for development.
+With the requirements set out in the previous section in mind, let's be specific about what we need.
 
-We'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
-We're going to discuss our participation in the CASE 2021 Fine-Grained Event Classification shared task.
+- a good vectorizer for snippets of news text
+- a fast search index for looking up the most similar items to a query
+
+We can trade-off performance for speed as needed by using more efficient vectorizers. 
+
+### The Zero-shot Event Classification Task
+
+To test our system, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
+We participated in Task 2 of the CASE 2021 shared task: Fine-Grained Event Classification.
 Shared tasks are a great way to test and share ideas in a fair and open setting, 
 and to get fast feedback about how different approaches stack up. Many thanks to the organizers of the CASE 2021 
 shared task for all of the hard work they did.  
 
-### The Zero-shot Event Classification Task
 
 #### The Setting
 Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
