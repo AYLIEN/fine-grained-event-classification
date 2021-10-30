@@ -1,4 +1,4 @@
-# Blog: Zero-Shot Event Classification in News
+# Blog: Zero-Shot Event Classification for Newsfeeds
 
 
 #### TLDR
@@ -100,6 +100,12 @@ High Throughput
 Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
 they do not meet our scalability requirements, because a cross-encoder would require passing every possible combination of snippet + candidate-label. 
 through the model. Instead, we will use a bi-encoder which embeds snippets and label descriptions in to the same embedding space. 
+
+<p align="center">
+  <img src="../diagrams/sentence-transformers-Bi_vs_Cross-Encoder.png" alt="drawing" width="600"/>
+</p>
+Image from [Sentence Transformers documentation](https://www.sbert.net/examples/applications/cross-encoder/README.html#when-to-use-cross-bi-encoders)
+
 
 [//]: # (TODO: point reader to cross- vs bi- encoders)
 
