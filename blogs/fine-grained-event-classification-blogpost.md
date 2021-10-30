@@ -68,43 +68,14 @@ With the requirements set out in the previous section in mind, let's be specific
 
 We can trade-off performance for speed as needed by using more efficient vectorizers. 
 
-### The Zero-shot Event Classification Task
+#### Nearest-Neighbors Based Zero-Shot Classification
 
-To test our system, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
-We participated in Task 2 of the CASE 2021 shared task: Fine-Grained Event Classification.
-Shared tasks are a great way to test and share ideas in a fair and open setting, 
-and to get fast feedback about how different approaches stack up. Many thanks to the organizers of the CASE 2021 
-shared task for all of the hard work they did.  
-
-
-#### The Setting
 Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
 Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
 description in the case of text classification. 
 We are interested in this setup because it simplifies the baseline event classification workflow a lot: 
 if a user comes to us with a new event type, we want to be able to immediately start serving them news events of 
 that class without needing to collect a new labelled dataset or go through a complicated re-training/tuning stage. 
-
-In a nutshell, we wish to have a classifier that can solve this problem:
-```
-Input: snippets of text
-Output: snippets labeled according to a taxonomy of event types
-No training data
-High Throughput
-```
-
-In this post, we'll go over an approach to zero-shot event classification that worked well at 
-the CASE 2021 fine grained event detection shared task. Code and examples are available
-in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
-
-**The shared task**
-
-The CASE fine-grained event classification shared task is an ideal challenge for testing zero-shot text classification models. 
-The task is to classify short text snippets that report socio-political events into fine-grained event types. 
-These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, 
-which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
-
-#### Nearest-Neighbors Based Zero-Shot Classification
 
 Since we’re sciency types, obviously we want to use cool machine learning models.
 And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
@@ -117,7 +88,20 @@ In this particular task, label descriptions are for example "Man-made disaster" 
 A powerful zero-shot model could be trained to jointly "read" both the text snippet and a 
 label description to output a score indicating how closely related they are. 
 
+In a nutshell, we wish to have a classifier that can solve this problem:
+```
+Input: snippets of text
+Output: snippets labeled according to a taxonomy of event types
+No training data
+High Throughput
+```
+
 [//]: # (TODO: cite NLI-based models)
+Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
+they do not meet our scalability requirements, because a cross-encoder would require passing every possible combination of snippet + candidate-label. 
+through the model. Instead, we will use a bi-encoder which embeds snippets and label descriptions in to the same embedding space. 
+
+[//]: # (TODO: point reader to cross- vs bi- encoders)
 
 However, doing pairwise comparisons between thousands or millions of text snippets and tens or 
 hundreds of labels is computationally expensive.
@@ -139,6 +123,25 @@ Here is a diagram of this framework:
 <p align="center">
   <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
 <p>
+
+In this post, we'll go over an approach to zero-shot event classification that worked well at 
+the CASE 2021 fine grained event detection shared task. Code and examples are available
+in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
+
+**The shared task**
+  
+### Zero-shot Event Classification
+
+To test our system, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
+We participated in Task 2 of the CASE 2021 shared task: Fine-Grained Event Classification.
+Shared tasks are a great way to test and share ideas in a fair and open setting, 
+and to get fast feedback about how different approaches stack up. Many thanks to the organizers of the CASE 2021 
+shared task for all of the hard work they did.  
+
+The CASE fine-grained event classification shared task is an ideal challenge for testing zero-shot text classification models. 
+The task is to classify short text snippets that report socio-political events into fine-grained event types. 
+These types are based on the Armed Conflict Location & Event Data Project (ACLED) event taxonomy, 
+which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
   
 We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. 
 The model described above worked best.
