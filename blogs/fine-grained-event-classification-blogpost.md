@@ -46,7 +46,7 @@ we are building a ML-driven event monitoring system for _**filtering**_ news con
 #### Detecting Event Types
 
 To build our news event monitoring system, we will need a way of classifying news events according to their type. 
-We can approach this as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
+We can approach this as a standard text-classification task, but with an interesting twist: we may not know the types of events up-front. 
 In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
 In another twist: we may not have _**any**_ training data at all for the classes we want to detect. We might just have 
