@@ -33,17 +33,19 @@ processing high volumes of content, and we don't scale well.
 
 ### Event Classification
 
-We would like to build automatic ways to filter a raw stream of news to only contain events that are relevant to us. 
-One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
-that are assigned by our models. This is similiar to following particular topics on sites such as Google News, with the important
+We would like to build automatic ways to filter a raw stream of news into a feed which only contain events that are (1) relevant and 
+(2) novel for a given user. This post focuses on (1): classifying news events as relevant / not relevant to specific topics. 
+
+We will use machine learning models for text classification and let users both **define** and **subscribe** to labels of interest. 
+This is similiar to following particular topics on sites such as Google News, with the important
 distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
 we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
 
-[//]: # (TODO: note that recommender systems intuitively go for precision and don't worry about recall)
+[//]: # (TODO: note that recommender systems intuitively go for precision and usually don't worry about recall)
 
 #### Detecting Event Types
 
-To build our news event monitoring system, we will need a way of classifying events according to their type. 
+To build our news event monitoring system, we will need a way of classifying news events according to their type. 
 We can approach this as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
 In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
@@ -55,20 +57,21 @@ while easily handling hundreds or thousands of distinct labels, each of which ma
 per day. 
 
 Amazingly, it is actually possible to build a simple baseline system that satisfies these requirements.
-It won't outperform usecase-specific systems that use expensive models with substantial in-domain training data, 
-but it will serve as a good baselines for any explorations in text classification, 
-especially for usecases where scalable support for zero-shot classification is an essential requirement.
+It won't outperform usecase-specific systems that use expensive models and well-tuned hyperparametes along 
+with substantial in-domain training data, but it will serve as a good baseline for any explorations in text classification, 
+especially for usecases where scalable support for zero-shot classification is an essential requirement. And we can get it up 
+and running in less than five minutes(!). 
 
-#### Key Ingredients
+### Key Ingredients
 
-With the requirements set out in the previous section in mind, let's be specific about what we need.
+With the requirements set out in the previous section in mind, let's get specific. We're going to build a nearest-neighbor based 
+zero-shot classifier. 
 
-- a good vectorizer for snippets of news text
+We'll need:
+- a good vectorizer for snippets of news text and label descriptions
 - a fast search index for looking up the most similar items to a query
 
-We can trade-off performance for speed as needed by using more efficient vectorizers. 
-
-#### Nearest-Neighbors Based Zero-Shot Classification
+### Nearest-Neighbors Based Zero-Shot Classification
 
 Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
 Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
@@ -230,6 +233,8 @@ https://aclanthology.org/2021.case-1.26/
 
 -----------
 ## Buffer
+
+We can trade-off performance for speed as needed by using more efficient vectorizers.   
 
 #### Why we care about event classification at Aylien
 
