@@ -2,8 +2,8 @@
 
 
 #### TLDR
-* we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
 * we share a simple, effective and scalable approach for zero-shot event classification
+* we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
 * we provide jupyter notebooks with code and examples
 
 #### What you can do with this work
