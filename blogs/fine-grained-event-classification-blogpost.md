@@ -154,7 +154,9 @@ These types are based on the Armed Conflict Location & Event Data Project (ACLED
 which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
   
 We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. 
-The model described above worked best.
+The model described above worked best, and in the second phase of the shared task this simple approach acheived the best results on the zero-shot labels 
+  (weighted F1 to .445 for the 5 new labels), outperforming much heavier pairwise NLI based systems.
+
 
 **Results**
   
@@ -202,10 +204,19 @@ If you'd like to test this approach with other news data, have a look at some of
 
 In practice, creating performant and scalable NLP models for real products usually requires iteration 
 on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
-data annotation, and real-world ML experience. 
+data annotation, and real-world ML experience.
+  
+However, a zero-shot nearest neighbors model is a great baseline and a sanity check for pretty much any text classification task.
+All you need is a small test set, which could even be bootstrapped online by collecting user feedback on the zero-shot classification 
+baseline. 
 
 
 ## References
+
+https://aclanthology.org/2021.case-1.23.pdf
+Fine-grained Event Classification in News-like Text Snippets - Shared Task 2, CASE 2021
+J Haneczok, G Jacquet, J Piskorski, N Stefanovitch
+Proceedings of the Workshop on Challenges and Applications of Automated Extraction of Socio-political Events from Text (CASE 2021), co-located with the Joint Conference of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (ACL-IJCNLP 2021)
 
 Case 2021 Task 2: Fine-grained Event Classification Github repo 
 https://github.com/emerging-welfare/case-2021-shared-task/tree/main/task2
