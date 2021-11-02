@@ -169,6 +169,8 @@ The CASE shared task organizers picked 5 event types for zero-shot experiments. 
 | **weighted** | 0.920     | 0.358  | 0.443     |
 
 Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
+  
+The final test data is released here: https://github.com/emerging-welfare/case-2021-shared-task/blob/main/task2/test_dataset/test_set_final_release_with_labels.tsv
 
 ### Transformers vs. Word2Vec
 
