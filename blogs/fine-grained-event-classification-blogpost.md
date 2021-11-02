@@ -1,5 +1,6 @@
 # Blog: Zero-Shot Event Classification for Newsfeeds
 
+By Chris Hokamp and Demian Gholipour Ghalandari
 
 #### TLDR
 * we share a simple, effective and scalable approach for zero-shot event classification
@@ -190,9 +191,11 @@ We simply embed each of the labels using its meta-data and we are immediately re
 There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
 
 From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
-document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is taught in applied ML courses. 
+document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is introduced in applied ML courses.
 In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
 and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
+  
+If you'd like to test this approach with other news data, have a look at some of the [Aylien topical datasets](https://aylien.com/resources/datasets).
 
 
 ### Conclusion
