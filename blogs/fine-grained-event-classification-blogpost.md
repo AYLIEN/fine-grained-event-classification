@@ -1,9 +1,10 @@
 # Blog: Zero-Shot Event Classification for Newsfeeds
 
+By Chris Hokamp and Demian Gholipour Ghalandari
 
 #### TLDR
-* we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
 * we share a simple, effective and scalable approach for zero-shot event classification
+* we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
 * we provide jupyter notebooks with code and examples
 
 #### What you can do with this work
@@ -25,7 +26,9 @@ For example, we might visualize yesterday’s top news events like this:
 
 However, raw streams of news events, such as the RSS feeds of major news publishers, are very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
-processing high volumes of content, and we don't scale well. 
+processing high volumes of content, and we don't scale well. Therefore, we would like to build automatic ways 
+to filter a raw stream of news into a feed which only contain events that are (1) relevant and (2) novel 
+for a given user. This post focuses on (1): classifying news events as relevant / not relevant to specific topics. 
 
 <p align="center">
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
@@ -33,18 +36,18 @@ processing high volumes of content, and we don't scale well.
 
 ### Event Classification
 
-We would like to build automatic ways to filter a raw stream of news to only contain events that are relevant to us. 
-One way of filtering is to use machine learning models for text classification, and to only **subscribe** to certain labels 
-that are assigned by our models. This is similiar to following particular topics on sites such as Google News, with the important
+In our hypothetical event filtering system, we'll use machine learning models to categorize content, and  
+let users both **define** and **subscribe** to labels of interest. 
+This is similiar to following particular topics on sites such as Google News, with the important
 distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
 we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
 
-[//]: # (TODO: note that recommender systems intuitively go for precision and don't worry about recall)
+[//]: # (TODO: note that recommender systems intuitively go for precision and usually don't worry about recall)
 
 #### Detecting Event Types
 
-To build our news event monitoring system, we will need a way of classifying events according to their type. 
-We can approach this as a text-classification task, with an interesting twist: we may not know the types of events up-front. 
+To build our news event monitoring system, we will need a way of classifying news events according to their type. 
+We can approach this as a standard text-classification task, but with an interesting twist: we may not know the types of events up-front. 
 In other words, we want to design a pipeline that supports the addition of new labels on-the-fly.
 
 In another twist: we may not have _**any**_ training data at all for the classes we want to detect. We might just have 
@@ -55,27 +58,29 @@ while easily handling hundreds or thousands of distinct labels, each of which ma
 per day. 
 
 Amazingly, it is actually possible to build a simple baseline system that satisfies these requirements.
-It won't outperform usecase-specific systems that use expensive models with substantial in-domain training data, 
-but it will serve as a good baselines for any explorations in text classification, 
-especially for usecases where scalable support for zero-shot classification is an essential requirement.
+It won't outperform usecase-specific systems that use more powerful models and well-tuned hyperparameters along 
+with substantial in-domain training data, but it will serve as a good baseline for any explorations in text classification, 
+especially for usecases where scalable support for zero-shot classification is an essential requirement. And we can get it up 
+and running in less than five minutes(!). 
 
-#### Key Ingredients
+### Key Ingredients
 
-With the requirements set out in the previous section in mind, let's be specific about what we need.
+With the requirements set out in the previous section in mind, let's get specific. We're going to build a nearest-neighbor based 
+zero-shot classifier, and treat this problem as semantic search, where the queries are text snippets, and the candidate items in 
+the index are labels. 
 
-- a good vectorizer for snippets of news text
-- a fast search index for looking up the most similar items to a query
+We'll need:
+- a good vectorizer for snippets of news text and label descriptions
+- an index for looking up the most similar items to a query
 
-We can trade-off performance for speed as needed by using more efficient vectorizers. 
+### Nearest-Neighbors Based Zero-Shot Classification
 
-#### Nearest-Neighbors Based Zero-Shot Classification
-
-Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
+Zero-shot classification tasks are characterized by the lack of any labeled examples for the classes of interest. 
 Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
 description in the case of text classification. 
 We are interested in this setup because it simplifies the baseline event classification workflow a lot: 
 if a user comes to us with a new event type, we want to be able to immediately start serving them news events of 
-that class without needing to collect a new labelled dataset or go through a complicated re-training/tuning stage. 
+that class without needing to annotate a new labelled dataset or go through a complicated re-training/tuning stage. 
 
 Since we’re sciency types, obviously we want to use cool machine learning models.
 And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
@@ -95,6 +100,15 @@ Output: snippets labeled according to a taxonomy of event types
 No training data
 High Throughput
 ```
+
+Recent transformer-based models for zero-shot classification are basically of two types:
+(1) bi-encoders encode the input and each of the labels separately
+(2) cross-encoders encode the input and each label together
+
+Cross-encoders usually perform better on zero-shot tasks, but they are _much_ more expensive at runtime, 
+because they require us to run the model once for each possible (input, label) pair. For usecases with more than a few labels, 
+this approach will not scale, and for usecases with thousands of labels, it is completely intractable. Bi-encoders encode each 
+label into a fixed representation that does not depend upon the input, but they are much more efficient at runtime. 
 
 [//]: # (TODO: cite NLI-based models)
 Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
@@ -150,7 +164,9 @@ These types are based on the Armed Conflict Location & Event Data Project (ACLED
 which contains 25 detailed event types, such as “Peaceful protest”, “Protest with intervention”, or “Diplomatic event”.
   
 We submitted several systems to the CASE 2021 shared task to get an idea how our models stack up in an unbiased evaluation setting. 
-The model described above worked best.
+The model described above worked best, and in the second phase of the shared task this simple approach acheived the best results on the zero-shot labels 
+  (weighted F1 to .445 for the 5 new labels), outperforming much heavier pairwise NLI based systems.
+
 
 **Results**
   
@@ -163,6 +179,8 @@ The CASE shared task organizers picked 5 event types for zero-shot experiments. 
 | **weighted** | 0.920     | 0.358  | 0.443     |
 
 Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
+  
+The final test data is released here: https://github.com/emerging-welfare/case-2021-shared-task/blob/main/task2/test_dataset/test_set_final_release_with_labels.tsv
 
 ### Transformers vs. Word2Vec
 
@@ -187,19 +205,30 @@ We simply embed each of the labels using its meta-data and we are immediately re
 There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
 
 From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
-document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is taught in applied ML courses. 
+document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is introduced in applied ML courses.
 In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
 and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
+  
+If you'd like to test this approach with other news data, have a look at some of the [Aylien topical datasets](https://aylien.com/resources/datasets).
 
 
 ### Conclusion
 
 In practice, creating performant and scalable NLP models for real products usually requires iteration 
 on both datasets and models, and any off-the-shelf solution will seldom hold up to the combination of domain knowledge,
-data annotation, and real-world ML experience. 
+data annotation, and real-world ML experience.
+  
+However, a zero-shot nearest neighbors model is a great baseline and a sanity check for pretty much any text classification task.
+All you need is a small test set, which could even be bootstrapped online by collecting user feedback on the zero-shot classification 
+baseline. 
 
 
 ## References
+
+https://aclanthology.org/2021.case-1.23.pdf
+Fine-grained Event Classification in News-like Text Snippets - Shared Task 2, CASE 2021
+J Haneczok, G Jacquet, J Piskorski, N Stefanovitch
+Proceedings of the Workshop on Challenges and Applications of Automated Extraction of Socio-political Events from Text (CASE 2021), co-located with the Joint Conference of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (ACL-IJCNLP 2021)
 
 Case 2021 Task 2: Fine-grained Event Classification Github repo 
 https://github.com/emerging-welfare/case-2021-shared-task/tree/main/task2
@@ -230,6 +259,8 @@ https://aclanthology.org/2021.case-1.26/
 
 -----------
 ## Buffer
+
+We can trade-off performance for speed as needed by using more efficient vectorizers.   
 
 #### Why we care about event classification at Aylien
 
