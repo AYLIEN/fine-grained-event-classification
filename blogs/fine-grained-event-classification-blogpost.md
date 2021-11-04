@@ -26,7 +26,9 @@ For example, we might visualize yesterday’s top news events like this:
 
 However, raw streams of news events, such as the RSS feeds of major news publishers, are very noisy. 
 Humans are good at contextualizing information and understanding what is useful, but we aren't good at 
-processing high volumes of content, and we don't scale well. 
+processing high volumes of content, and we don't scale well. Therefore, we would like to build automatic ways 
+to filter a raw stream of news into a feed which only contain events that are (1) relevant and (2) novel 
+for a given user. This post focuses on (1): classifying news events as relevant / not relevant to specific topics. 
 
 <p align="center">
   <img src="../diagrams/manual-news-event-extraction.png" alt="drawing" width="600"/>
@@ -34,10 +36,8 @@ processing high volumes of content, and we don't scale well.
 
 ### Event Classification
 
-We would like to build automatic ways to filter a raw stream of news into a feed which only contain events that are (1) relevant and 
-(2) novel for a given user. This post focuses on (1): classifying news events as relevant / not relevant to specific topics. 
-
-We will use machine learning models for text classification and let users both **define** and **subscribe** to labels of interest. 
+In our hypothetical event filtering system, we'll use machine learning models to categorize content, and  
+let users both **define** and **subscribe** to labels of interest. 
 This is similiar to following particular topics on sites such as Google News, with the important
 distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
 we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
@@ -58,7 +58,7 @@ while easily handling hundreds or thousands of distinct labels, each of which ma
 per day. 
 
 Amazingly, it is actually possible to build a simple baseline system that satisfies these requirements.
-It won't outperform usecase-specific systems that use expensive models and well-tuned hyperparametes along 
+It won't outperform usecase-specific systems that use more powerful models and well-tuned hyperparameters along 
 with substantial in-domain training data, but it will serve as a good baseline for any explorations in text classification, 
 especially for usecases where scalable support for zero-shot classification is an essential requirement. And we can get it up 
 and running in less than five minutes(!). 
@@ -66,20 +66,21 @@ and running in less than five minutes(!).
 ### Key Ingredients
 
 With the requirements set out in the previous section in mind, let's get specific. We're going to build a nearest-neighbor based 
-zero-shot classifier. 
+zero-shot classifier, and treat this problem as semantic search, where the queries are text snippets, and the candidate items in 
+the index are labels. 
 
 We'll need:
 - a good vectorizer for snippets of news text and label descriptions
-- a fast search index for looking up the most similar items to a query
+- an index for looking up the most similar items to a query
 
 ### Nearest-Neighbors Based Zero-Shot Classification
 
-Zero-shot classification settings are characterized by the lack of any labeled examples for the classes of interest. 
+Zero-shot classification tasks are characterized by the lack of any labeled examples for the classes of interest. 
 Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
 description in the case of text classification. 
 We are interested in this setup because it simplifies the baseline event classification workflow a lot: 
 if a user comes to us with a new event type, we want to be able to immediately start serving them news events of 
-that class without needing to collect a new labelled dataset or go through a complicated re-training/tuning stage. 
+that class without needing to annotate a new labelled dataset or go through a complicated re-training/tuning stage. 
 
 Since we’re sciency types, obviously we want to use cool machine learning models.
 And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
@@ -99,6 +100,15 @@ Output: snippets labeled according to a taxonomy of event types
 No training data
 High Throughput
 ```
+
+Recent transformer-based models for zero-shot classification are basically of two types:
+(1) bi-encoders encode the input and each of the labels separately
+(2) cross-encoders encode the input and each label together
+
+Cross-encoders usually perform better on zero-shot tasks, but they are _much_ more expensive at runtime, 
+because they require us to run the model once for each possible (input, label) pair. For usecases with more than a few labels, 
+this approach will not scale, and for usecases with thousands of labels, it is completely intractable. Bi-encoders encode each 
+label into a fixed representation that does not depend upon the input, but they are much more efficient at runtime. 
 
 [//]: # (TODO: cite NLI-based models)
 Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
