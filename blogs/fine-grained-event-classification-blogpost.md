@@ -40,12 +40,9 @@ for a given user. This post focuses on (1): classifying news events as relevant 
 
 ### Event Classification
 
-In our event filtering system, we'll use machine learning models to categorize content, and  
-let users both **define** and **subscribe** to labels of interest. 
-This is similiar to following particular topics on sites such as Google News, with the important
-distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a 
-precision-focused recommender system to drive user interactions, we are building an event monitoring system 
-for _**filtering**_ news content, and both precision and recall are important.
+In our event filtering system, we'll use machine learning models to categorize content, and let users both **define** and **subscribe** to labels of interest. 
+
+This is similiar to following particular topics on sites such as Google News, with the important distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a precision-focused recommender system to drive user interactions, we are building an event monitoring system for _**filtering**_ news content, and both precision and recall are important.
 
 [//]: # (TODO: note that recommender systems intuitively go for precision and usually don't worry about recall)
 
@@ -107,41 +104,38 @@ High Throughput
 ```
 
 Recent transformer-based models for zero-shot classification are basically of two types:
-(1) bi-encoders encode the input and each of the labels separately
-(2) cross-encoders encode the input and each label together
-
-Cross-encoders usually perform better on zero-shot tasks, but they are _much_ more expensive at runtime, 
-because they require us to run the model once for each possible (input, label) pair. For usecases with more than a few labels, 
-this approach will not scale, and for usecases with thousands of labels, it is completely intractable. Bi-encoders encode each 
-label into a fixed representation that does not depend upon the input, but they are much more efficient at runtime. 
-
-[//]: # (TODO: cite NLI-based models)
-Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
-they do not meet our scalability requirements, because a cross-encoder would require passing every possible combination of snippet + candidate-label. 
-through the model. Instead, we will use a bi-encoder which embeds snippets and label descriptions in to the same embedding space. 
+(1) **bi-encoders** encode the input and each of the labels separately
+(2) **cross-encoders** encode the input and each label together
 
 <p align="center">
   <img src="../diagrams/sentence-transformers-Bi_vs_Cross-Encoder.png" alt="drawing" width="600"/>
 </p>
 Image from [Sentence Transformers documentation](https://www.sbert.net/examples/applications/cross-encoder/README.html#when-to-use-cross-bi-encoders)
 
+Cross-encoders usually perform better on zero-shot tasks, but they are _much_ more expensive at runtime, 
+because they require us to run the model once for each possible (input, label) pair. For usecases with more than a few labels, 
+this approach will not scale, and for usecases with thousands of labels, it is completely intractable. Bi-encoders encode each 
+label into a fixed representation that does not depend upon the input, but they are much more efficient at runtime. 
 
-[//]: # (TODO: point reader to cross- vs bi- encoders)
+Some recently published zero-shot models use cross-encoders pre-trained on the NLI task. Although these models perform well,
+they do not meet our scalability requirements, because a cross-encoder would require passing every possible combination of snippet + candidate-label. 
+through the model. 
 
-However, doing pairwise comparisons between thousands or millions of text snippets and tens or 
-hundreds of labels is computationally expensive.
+Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space using a bi-encoder. We will measure the cosine similarity between the embedding of a snippet and each candidate label. In standard classification tasks, we decide which label to output by simply picking the label with the closest embedding. 
 
-Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space. Using these embeddings, we measure the cosine similarity between a snippet and each label. We classify a snippet by simply picking the label with the closest embedding. A crucial requirement is to have a powerful vector representation. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels. We summarize our approach as follows:
-1) Encode label descriptions, store label embeddings
-2) Classify a new text snippet:
+A powerful general-purpose text vectorizer is a crucial requirement for our system. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels.
+
+Our approach can be summarized as follows:
+1) Encode label description and store the resulting label embeddings in the search index
+2) Classify a incoming text snippets:
   - encode snippet
   - measure cosine between snippet embbedding and label embeddings
   - pick label with closest embedding
 
-If we have hundreds or thousands of labels, measuring the cosine to every single label can also be become expensive - however, 
-there is a simple fix: we can use *approximate nearest-neighbor search* to find the closest label(s). 
+If we have hundreds or thousands of labels, even just measuring the cosine to every single label can also be become expensive - however, 
+there is a simple fix for the case where our label space becomes very large: we can use *approximate nearest-neighbor search* to find the closest label(s). 
 
-The approach naturally supports dynamic labels: we simply add or remove labels and their embeddings from our storage.
+The approach naturally supports dynamic labels and zero-shot classification: we can simply add or remove labels and their embeddings from our storage as needed.
 
 Here is a diagram of this framework:
 
