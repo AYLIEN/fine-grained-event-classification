@@ -14,7 +14,9 @@ By Chris Hokamp and Demian Gholipour Ghalandari
 
 In this post, we'll go over an approach to zero-shot event classification that worked well at 
 the CASE 2021 fine grained event detection shared task. Code and examples are available
-in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
+in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification). 
+
+Although several similar approches have been blogged about elsewhere, we claim that [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) is the current fastest way to get a zero-shot text classifier running locally. 
 
 ----------------- 
 ### The News as a Stream of Events
@@ -194,6 +196,8 @@ performance and throughput in production settings.
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
 and use it to build a custom classifier.
 
+Chris: TODO: add gif of model training here
+
 This notebook sets up the dataset for the fine grained shared task, and implements a zero-shot prediction model, 
 which uses the [paraphrase-multilingual-mpnet-base-v2](https://www.sbert.net/docs/pretrained_models.html) 
 from the [sentence transformers library](https://www.sbert.net/index.html). This excellent library and repository of pre-trained models 
@@ -203,8 +207,11 @@ We simply embed each of the labels using its meta-data and we are immediately re
 
 There are additional notebooks available in the `notebooks/` directory that we plan to discuss in the second post of this series.
 
+
+### Side Note on Pedagogy
+
 From a pedagogical perspective, we believe this approach may be even more intuitive for newcomers to deep learning and 
-document embedding than the supervised view of K-nearest-neighbors models that is often the first topic that is introduced in applied ML courses.
+document embeddings than the supervised view of K-nearest-neighbors models that is often the first topic that is introduced in applied ML courses.
 In the design we have outlined above, we are effectively treating each label's description as a weakly-labeled training instance, 
 and creating a KNN classifier with `K = 1` and exactly one candidate for each label in the output space. 
   
