@@ -3,7 +3,7 @@
 By Chris Hokamp and Demian Gholipour Ghalandari
 
 #### TLDR
-* we share a simple, effective and scalable approach for zero-shot event classification
+* we share a simple, effective and scalable approach for bootstrapping zero-shot text classification models
 * we give an overview of zero-shot learning for fine-grained event classification and the CASE 2021 shared task
 * we provide jupyter notebooks with code and examples
 
@@ -12,7 +12,9 @@ By Chris Hokamp and Demian Gholipour Ghalandari
 * Start building a zero-shot classifier by writing down descriptions of events you’re interested in
 * Apply our system to classify news with your custom labels
 
-We hope readers come away with a clear understanding of how easy it is to create reasonably efficient zero-shot text-classification models that are good baselines for many real world tasks.
+In this post, we'll go over an approach to zero-shot event classification that worked well at 
+the CASE 2021 fine grained event detection shared task. Code and examples are available
+in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
 
 ----------------- 
 ### The News as a Stream of Events
@@ -36,11 +38,12 @@ for a given user. This post focuses on (1): classifying news events as relevant 
 
 ### Event Classification
 
-In our hypothetical event filtering system, we'll use machine learning models to categorize content, and  
+In our event filtering system, we'll use machine learning models to categorize content, and  
 let users both **define** and **subscribe** to labels of interest. 
 This is similiar to following particular topics on sites such as Google News, with the important
-distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a recommender system, 
-we are building a ML-driven event monitoring system for _**filtering**_ news content, and both precision and recall are important.
+distinction that we do not want to miss *any* events of a certain type. In other words, we are not building a 
+precision-focused recommender system to drive user interactions, we are building an event monitoring system 
+for _**filtering**_ news content, and both precision and recall are important.
 
 [//]: # (TODO: note that recommender systems intuitively go for precision and usually don't worry about recall)
 
@@ -143,10 +146,6 @@ Here is a diagram of this framework:
 <p align="center">
   <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
 <p>
-
-In this post, we'll go over an approach to zero-shot event classification that worked well at 
-the CASE 2021 fine grained event detection shared task. Code and examples are available
-in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification).  
 
 **The shared task**
   
