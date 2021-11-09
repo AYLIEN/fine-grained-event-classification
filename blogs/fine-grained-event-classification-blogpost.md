@@ -16,7 +16,7 @@ In this post, we'll go over an approach to zero-shot event classification that w
 the CASE 2021 fine grained event detection shared task. Code and examples are available
 in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification). 
 
-Although several similar approches have been blogged about elsewhere, we claim that [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) is the current fastest way to get a zero-shot text classifier running locally. 
+Although several similar approches have been blogged about elsewhere, we claim that [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) is the current fastest way to get a zero-shot text classifier running on a local machine. 
 
 ----------------- 
 ### The News as a Stream of Events
@@ -84,10 +84,12 @@ We are interested in this setup because it simplifies the baseline event classif
 if a user comes to us with a new event type, we want to be able to immediately start serving them news events of 
 that class without needing to annotate a new labelled dataset or go through a complicated re-training/tuning stage. 
 
-Since we’re sciency types, obviously we want to use cool machine learning models.
+Since we’re data-sciency types, obviously we want to use cool machine learning models.
 And since we’re engineers we want the model we use to be fast, cheap, and scalable. 
 So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
 but we’re going to be clever about how we set things up.
+
+### Zero-Shot Classification with Semantic Search
 
 The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. 
 
@@ -102,6 +104,9 @@ Output: snippets labeled according to a taxonomy of event types
 No training data
 High Throughput
 ```
+
+Transformers are the current state-of-the-art for almost all NLP tasks because of the availability of high-quality pre-trained models, 
+and because of the flexiblity and effectiveness of the architecture for transfer learning. 
 
 Recent transformer-based models for zero-shot classification are basically of two types:
 (1) **bi-encoders** encode the input and each of the labels separately
@@ -123,7 +128,7 @@ through the model.
 
 Instead, we will encode text snippets and label descriptions separately into embeddings of the same vector space using a bi-encoder. We will measure the cosine similarity between the embedding of a snippet and each candidate label. In standard classification tasks, we decide which label to output by simply picking the label with the closest embedding. 
 
-A powerful general-purpose text vectorizer is a crucial requirement for our system. We use a model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels.
+A powerful general-purpose text vectorizer is a crucial requirement for our system. We must carefully chose the model we use to vectorize snippets, because performance of our classifier completely relies on its effectiveness. After significant experimentation, we settled on model from the [sentence-transformers](https://www.sbert.net/) library to vectorize text snippets and labels.
 
 Our approach can be summarized as follows:
 1) Encode label description and store the resulting label embeddings in the search index
@@ -179,7 +184,10 @@ The final test data is released here: https://github.com/emerging-welfare/case-2
 
 ### Transformers vs. Word2Vec
 
-One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. 
+Unlike KNN models with substantial training data, sparse vectorizers such as TF-IDF or BM25 do not work well for the zero-shot classification task becuase we need vector representations to generalize far beyond the very limited metadata that we have for each label. 
+  
+One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. As discussed above, the choice of vectorizer is the key factor affecting the performance of this approach.
+
 However, we are embedding short snippets of text in this task, so these results might not hold if we were processing whole documents. 
 Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model 
 performance and throughput in production settings. 
