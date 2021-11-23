@@ -65,17 +65,7 @@ with substantial in-domain training data, but it will serve as a good baseline f
 especially for usecases where scalable support for zero-shot classification is an essential requirement. And we can get it up 
 and running in less than five minutes(!). 
 
-### Key Ingredients
-
-With the requirements set out in the previous section in mind, let's get specific. We're going to build a nearest-neighbor based 
-zero-shot classifier, and treat this problem as semantic search, where the queries are text snippets, and the candidate items in 
-the index are labels. 
-
-We'll need:
-- a good vectorizer for snippets of news text and label descriptions
-- an index for looking up the most similar items to a query
-
-### Nearest-Neighbors Based Zero-Shot Classification
+### The Zero-Shot Classification Setup
 
 Zero-shot classification tasks are characterized by the lack of any labeled examples for the classes of interest. 
 Instead, each class is usually represented through meta-information about the class itself, e.g. a short textual class 
@@ -89,13 +79,19 @@ And since we’re engineers we want the model we use to be fast, cheap, and scal
 So in order to build our baseline system, we’re going to constrain ourselves to the simplest type of model, 
 but we’re going to be clever about how we set things up.
 
+### Key Ingredients
+
+With the requirements set out in the previous sections in mind, let's get specific. We're going to build a nearest-neighbor based 
+zero-shot classifier, and treat this problem as semantic search, where the queries are text snippets, and the candidate items in 
+the index are labels. 
+
+We'll need:
+- a good vectorizer for snippets of news text and label descriptions
+- an index for looking up the most similar items to a query
+
 ### Zero-Shot Classification with Semantic Search
 
-The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. 
-
-In this particular task, label descriptions are for example "Man-made disaster" or "Peaceful protest". 
-A powerful zero-shot model could be trained to jointly "read" both the text snippet and a 
-label description to output a score indicating how closely related they are. 
+The core idea of many zero-shot text classification methods is to **compare** a text snippet to a label description. For example, given a label description such as "food recall", we want to compare text snippets to this label and identify relevant matches such as "Tesco recalls major chocolate brand products".
 
 In a nutshell, we wish to have a classifier that can solve this problem:
 ```
@@ -109,13 +105,14 @@ Transformers are the current state-of-the-art for almost all NLP tasks because o
 and because of the flexiblity and effectiveness of the architecture for transfer learning. 
 
 Recent transformer-based models for zero-shot classification are basically of two types:
-(1) **bi-encoders** encode the input and each of the labels separately
-(2) **cross-encoders** encode the input and each label together
+1) **bi-encoders** encode the input and each of the labels separately
+2) **cross-encoders** encode the input and each label together
+
+This diagram from the [Sentence Transformers documentation](https://www.sbert.net/examples/applications/cross-encoder/README.html#when-to-use-cross-bi-encoders) visualizes the difference:
 
 <p align="center">
-  <img src="../diagrams/sentence-transformers-Bi_vs_Cross-Encoder.png" alt="drawing" width="600"/>
+  <img src="../diagrams/sentence-transformers-Bi_vs_Cross-Encoder.png" alt="drawing" width="500"/>
 </p>
-Image from [Sentence Transformers documentation](https://www.sbert.net/examples/applications/cross-encoder/README.html#when-to-use-cross-bi-encoders)
 
 Cross-encoders usually perform better on zero-shot tasks, but they are _much_ more expensive at runtime, 
 because they require us to run the model once for each possible (input, label) pair. For usecases with more than a few labels, 
@@ -178,11 +175,11 @@ The CASE shared task organizers picked 5 event types for zero-shot experiments. 
 
 Based on the weighted F1-Score, our system was the best among several zero-shot approaches when we submitted it.
   
-The final test data is released here: https://github.com/emerging-welfare/case-2021-shared-task/blob/main/task2/test_dataset/test_set_final_release_with_labels.tsv
+The final test data is released in the [Github repo](https://github.com/emerging-welfare/case-2021-shared-task/blob/main/task2/test_dataset/test_set_final_release_with_labels.tsv) of the shared task. 
 
 ### Transformers vs. Word2Vec
 
-Unlike KNN models with substantial training data, sparse vectorizers such as TF-IDF or BM25 do not work well for the zero-shot classification task becuase we need vector representations to generalize far beyond the very limited metadata that we have for each label. 
+Unlike KNN models with substantial training data, sparse vectorizers such as TF-IDF or BM25 do not work well for the zero-shot classification task because we need vector representations to generalize far beyond the very limited metadata that we have for each label. 
   
 One of our important takeaways from this work was that transformer-based embedding models really are a lot better than word2vec-based embedding. As discussed above, the choice of vectorizer is the key factor affecting the performance of this approach.
 
@@ -190,9 +187,7 @@ However, we are embedding short snippets of text in this task, so these results 
 Also, transformer-based models are a lot more resource intensive, so there will likely always be some tradeoff between model 
 performance and throughput in production settings. 
 
-**Our Code**
-
-#### Notebooks 
+### Notebooks with our code
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
 and use it to build a custom classifier.
 
