@@ -147,10 +147,8 @@ Here is a diagram of this framework:
 <p align="center">
   <img src="../diagrams/zero-shot-baseline.png" alt="drawing" width="500"/></div>
 <p>
-
-**The shared task**
   
-### Zero-shot Event Classification
+### The CASE 2021 Fine-Grained Event Classification Shared Task
 
 To test our system, we'll focus on a specific text-classification task: zero-shot fine-grained event classification. 
 We participated in Task 2 of the CASE 2021 shared task: Fine-Grained Event Classification.
