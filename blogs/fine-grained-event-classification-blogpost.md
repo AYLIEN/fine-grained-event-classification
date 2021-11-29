@@ -13,7 +13,7 @@ By Chris Hokamp and Demian Gholipour Ghalandari
 * Apply our system to classify news with your custom labels
 
 In this post, we'll go over an approach to zero-shot event classification that worked well at 
-the CASE 2021 fine grained event detection shared task. Code and examples are available
+the [CASE 2021 fine grained event detection shared task](https://emw.ku.edu.tr/case-2021/). Code and examples are available
 in [our project repository](https://github.com/AYLIEN/fine-grained-event-classification). 
 
 Although several similar approches have been blogged about elsewhere, we claim that [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) is the current fastest way to get a zero-shot text classifier running on a local machine. 
@@ -191,7 +191,7 @@ performance and throughput in production settings.
 Check out our implementation in [this notebook](../notebooks/SentenceTransformers-ZeroShot-Baseline.ipynb) 
 and use it to build a custom classifier.
 
-Chris: TODO: add gif of model training here
+[//]: # (Chris: TODO: add gif of model training here)
 
 This notebook sets up the dataset for the fine grained shared task, and implements a zero-shot prediction model, 
 which uses the [paraphrase-multilingual-mpnet-base-v2](https://www.sbert.net/docs/pretrained_models.html) 
@@ -258,55 +258,4 @@ https://aclanthology.org/2021.case-1.26/
 
 
 
------------
-## Buffer
 
-We can trade-off performance for speed as needed by using more efficient vectorizers.   
-
-#### Why we care about event classification at Aylien
-
-There are many reasons I might be monitoring a stream of news for a certain type of event -- 
-I might be looking for events that would impact the supply chain of a particular business, or for events 
-that are likely to impact political decisions in a certain region. 
-
-One of the most common reasons to monitor the news at scale is to filter for new risks related to a 
-particular business vertical such as Environmental-Social-Governance related risks. 
-In each of these examples, I am looking for news events that meet a certain criteria. 
-One way to specify the type(s) of event I'm looking for is to use an existing taxonomy of event types 
-such as the one used by [ACLED](https://acleddata.com/). 
-
-For each new piece of text, one of the first things we may ask is "does this contain a event?". In other words, does 
-this piece of content describe an event. If it does, then we  "what type of event is this?". 
-Defining what an `Event` is is notoriously challenging, but in this work we will stick to discrete occurences over short timespans, 
-following the ACLED taxonomies. Implicitly or explicitly, we have a taxonomy of event types, 
-and we would like to put this piece of content in its place, or ignore it if it isn't one of the things we're looking for.
-
-But often, we are really only interested in certain _kinds_ of events. In other words, in my personal feed, 
-I only want to see events meeting certain criteria. For example, I might only care about monitoring a conflict or 
-geopolitical crisis in a certain region. I want to filter the news stream, removing everything that doesn't 
-meet the criteria of an interesting event. There are many ways we might approach this, 
-but one of the most straightforward is to label each piece of content with one or more 
-labels indicting what type of event happened.
-
-We call the task of labeling each event in a stream with its type **event classification**.
-
-In practice, news is a stream of data, but on a more useful level of abstraction, news is a stream of events. A timeline with discrete events ordered by time is a  good mental model for what the news is. 
-
-In news intelligence, we may also make a distinction between tagging based on content or categories, and instantiating specific events such as terrorist attacks or geopolitical conflict. 
-
-
-Visualize: tags vs event schemas
-Visualize: a timeline of terrorist attacks 
-
-Note: event duration, etc are out-of-scope
-
-
-Note the distinction between what happened (events) vs what the content is about (topics). 
-This is important because I don't want to see content that is a general discussion of geopolitical conflict, I only 
-want my stream to capture specific instances of conflict. I want to get pinged when a new terrorist attack happens, but I don't 
-want to get pinged about general discussions or opinion pieces related to terrorism. Let's try to make our mental model explicit -- 
-I have an idea of what an event is/isn't. Different types of events have different properties in their schemas, 
-and instantiations of the schema will be discrete events.
-
-Connect to pattern matching in FP and OOP
-Frame Semantics and FP/OOP
