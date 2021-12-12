@@ -15,7 +15,7 @@ git clone https://github.com/AYLIEN/fine-grained-event-classification
 ```
 (2) create an activate a new environment (we like miniconda)
 ```
-conda create -n event-classification python=3.7`
+conda create -n event-classification python=3.7
 conda activate event-classification
 ```
 (3) install dependencies
@@ -26,7 +26,12 @@ pip install -r requirements.txt
 ```
 pip install jupyter notebook
 ```
+
 (5) run `jupyter notebook` from the `notebooks/` directory 
+```
+cd notebooks
+jupyter notebook
+```
 
 
 
