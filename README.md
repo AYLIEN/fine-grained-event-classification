@@ -13,7 +13,7 @@ For each label, we only require an English description.
 ```
 git clone https://github.com/AYLIEN/fine-grained-event-classification
 ```
-(2) create and activate a new environment (we like miniconda)
+(2) create and activate a new environment (we like [miniconda](https://docs.conda.io/en/latest/miniconda.html))
 ```
 conda create -n event-classification python=3.7
 conda activate event-classification
